@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络安全警示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", "SimHei", sans-serif;
+            background: linear-gradient(135deg, #1a5fb4 0%, #0d326e 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .warning-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .badge {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: linear-gradient(45deg, #ffd700, #ffec8b);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+        
+        .badge::before {
+            content: "";
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #1a5fb4;
+            border-radius: 50%;
+            border: 5px solid #ffd700;
+        }
+        
+        .badge-image {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            z-index: 2;
+        }
+        
+        .warning-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #fff;
+        }
+        
+        .warning-content {
+            font-size: 24px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+        }
+        
+        .ip-address {
+            font-family: monospace;
+            font-size: 22px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 15px 0;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            animation: scan 3s linear infinite;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(255, 215, 0, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); }
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 600px) {
+            .warning-title { font-size: 26px; }
+            .warning-content { font-size: 20px; }
+            .badge { width: 100px; height: 100px; margin-bottom: 20px; }
+            .badge::before { width: 80px; height: 80px; }
+            .badge-image { width: 50px; height: 50px; }
+            .ip-address { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="warning-container">
+        <div class="scan-line"></div>
+        <div class="badge">
+            <img src="https://i.ibb.co/21TwTNtJ/t-Zv-H7-Zg-U0i.jpg" alt="警徽" class="badge-image">
+        </div>
+        <h1 class="warning-title">网络安全警示</h1>
+        <div class="warning-content">
+            <p>您的IP地址已被公安系统记录</p>
+            <div class="ip-address" id="ipAddress">
+                <span class="loading"></span> 正在获取IP地址...
+            </div>
+            <p>网络不是法外之地，请遵守法律法规</p>
+        </div>
+        <div class="footer">
+            <p>请自觉遵守网络安全相关规定，文明上网</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ipElement = document.getElementById('ipAddress');
+            
+            // 使用ip111.cn获取IP地址
+            fetch('http://www.ip111.cn/', {
+                headers: {
+                    'Accept': 'text/html,application/xhtml+xml,application/xml',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应不正常');
+                }
+                return response.text();
+            })
+            .then(html => {
+                // 从返回的HTML中提取IP地址
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // 尝试查找IP地址 - 根据ip111.cn的实际页面结构调整选择器
+                let ip = null;
+                
+                // 方法1: 查找包含IP地址的元素
+                const ipElements = doc.querySelectorAll('*');
+                for (let element of ipElements) {
+                    if (element.textContent && /(\d+\.\d+\.\d+\.\d+)/.test(element.textContent)) {
+                        ip = element.textContent.match(/(\d+\.\d+\.\d+\.\d+)/)[0];
+                        break;
+                    }
+                }
+                
+                if (ip) {
+                    ipElement.innerHTML = ip;
+                    
+                    // 添加IP地址闪烁效果
+                    setInterval(() => {
+                        ipElement.style.color = 
+                            ipElement.style.color === 'rgb(255, 107, 107)' ? '#ffd700' : '#ff6b6b';
+                    }, 800);
+                } else {
+                    throw new Error('无法解析IP地址');
+                }
+            })
+            .catch(error => {
+                console.error('获取IP地址失败:', error);
+                ipElement.textContent = '获取IP地址失败';
+            });
+        });
+    </script>
+</body>
+</html>
